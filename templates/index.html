@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Raleway:ital@1&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.6.0.js"
+	integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous">
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+	<style>	
+		
+		.centered{
+			width: 800px;
+			margin: 0 auto;
+			text-align: center;
+			font-family: "Georgia",serif;
+		
+		}
+		.form{
+			border: none;
+			border-bottom:2px #4682b4;
+			padding: 5px;
+			font-family: "Georgia",serif;
+		}
+		.button{
+			background-color: #4682b4;
+			  border: none;
+			    color: white;
+			      padding: 16px 32px;
+			        text-align: center;
+				  text-decoration: none;
+				    display: inline-block;
+				      font-size: 16px;
+				        margin: 4px 2px;
+					  transition-duration: 0.4s;
+					    cursor: pointer;
+					    font-family: "Georgia",serif;
+		}
+		.button:hover{
+			background-color: #4682b4;
+			color: white;
+		}
+		.img {
+			float: center;
+			padding: 5px;
+			width: 500px;
+			height: 500px;
+			background-size: cover;
+		}
+	</style>
+
+	</head>
+
+	<body>
+		<script>
+
+		function LoginAuth(){
+		$.post("/loginauth", {"username":$("#username").val(),"password":$("#password").val()},
+			function(data) {
+				if(data.data.jwt){
+					token = data.data;
+				}
+				else {
+					alert(data.data.message);
+				}
+				if(token != undefined){
+					$("#login").hide();
+					$("#chatroom").show();
+					
+				}
+
+			});
+		}
+
+		function SignupAuth(){
+		
+
+			$.post("/signup",{"username":$("#newuser").val(),"password":$("#newpw").val()},
+				function(data){
+					alert(data.data.message);
+			});
+			$("#login").show();
+			$("#signup").hide();
+		}
+
+		function showSignup(){
+			$("#login").hide();
+			$("#signup").show();
+		}
+
+
+		</script>
+		
+		<nav class="navbar navbar-light navbar-expand-md bg-light justify-content-md-center justify-content-start">
+			        <div class="navbar-collapse collapse justify-content-between align-items-center w-100">
+				<ul class="navbar-nav mx-auto text-md-center text-left">
+				<li class="nav-item my-auto">
+				<p class="nav-link navbar-brand mx-0 d-none d-md-inline">Jardin Photo Drive</p>
+				</li>
+				</ul>
+			 </div>
+		</nav>
+		<div id ="login" class ="centered">
+
+			<label for ="username"> User:  </label> <input class ="form" type ="text" id = "username" name = "username" required> <br>
+			<label for ="password"> Password:  </label> <input class="form" type = "password" id = "password" name = "password"> <br>
+			<input  id ="login_submit" class="button" type ="submit" value = "Log in" onclick="return LoginAuth();">
+			<input id ="sign_submit" class= "button"  type ="submit" value = "Sign Up" onclick="return showSignup();">
+
+
+		</div>
+
+		<div class="centered" id = "signup" style="display: none">
+			<div text-align="center" ><h1> Sign up. </h1></div>
+			  <label for ="newuser"> User </label> <input type ="text" id = "newuser" name = "newuser" required> <br>
+			  <label for ="newpw"> Password </label> <input type = "password" id = "newpw" name = "newpw"> <br>	
+			  <input id ="signup_complete" type ="submit" value = "Done" onclick="return SignupAuth();">
+		</div>
+
+
+		<div id="chatroom" style="display: none" class="centered">
+			<p>
+				{% with messages = get_flashed_messages() %}
+					  {% if messages %}
+								{% for message in messages %}
+								<div class ="alert alert-warning alert-dismissible fade show" role = "alert">
+									<span>	{{ message }} </span>
+								</div>
+								{% endfor %}
+					   {% endif %}
+				{% endwith %}
+			</p>
+
+                                            <h2 style="font-family: 'Raleway',sans-serif;"> Select a file to upload </h2>
+					    <h4 style="font-family: 'Raleway',sans-seif;"> 
+						    How to use: <br>
+						    1. Upload photo.<br>
+						    2. Re-login, you will be notified on upload success or not. <br>
+						    3. Your photo will appear below. <br>
+					    </h4>
+
+                                <form method="post" action="/upload" enctype="multipart/form-data">
+                                 <dl>
+                                         <p>
+                                                <input type="file" name="file" autocomplete="off" required>
+                                        </p>
+                                </dl>
+                                         <p>
+                                                <input type="submit" value="Submit">
+                                        </p>
+                                </form>
+
+
+
+			{% for image in images %}
+			<img class = "img" src="{{url_for('static', filename='uploads/' + image) }}"> 
+			{% endfor %}
+		</div>
+	</body>
+
+
+
